@@ -1,0 +1,226 @@
+<script>
+  alert('Click em OK e em seguida Comece com Uma Letra No Quadrado Amarelo:')
+Array.prototype.random = function() {
+    return this[Math.floor((Math.random()*this.length))];
+}
+ 
+Array.prototype.chrArrayToString = function(sep) {
+    var a = new String();
+var len = this.length;
+    for (var i = 0; i < len; i++) {        
+        a += this[i] 
+if (i+1<len) a += sep;
+    }
+    return a;    
+}
+ 
+Array.prototype.search = function(s,q){
+var len = this.length;
+if (q) {
+s=s.toString();
+for(var i=0; i<len; i++){
+if(this[i].constructor == Array) if(this[i].search(s,q)) return true;
+if(this[i].toString().indexOf(s) != -1) return true;
+}
+}
+else {
+for(var i=0; i<len; i++){
+if(this[i].constructor == Array) if(this[i].search(s,q)) return true;
+if(this[i]===s) return true;
+}
+}
+return false;
+}
+ 
+String.prototype.replaceAt=function() {
+  var rlen=(arguments[2]==null?1:arguments[2]);
+  return this.substring(0,arguments[0])+arguments[1]+this.substring(arguments[0]+rlen);
+}
+ 
+String.prototype.formatCurrency = function(c) {
+    var t = this; if(c == undefined) c = 2;
+    var p, d = (t=t.split("."))[1].substr(0, c);
+    for(p = (t=t[0]).length; (p-=3) > 1;) {
+        t = t.substr(0,p) + "." + t.substr(p);
+    }
+    return t+","+d+Array(c+1-d.length).join(0);
+}
+ 
+String.prototype.tiraacento = function (word){
+var palavra = this.toLowerCase();
+palavra = palavra.replace(/[áàâãª]/g,'a');
+palavra = palavra.replace(/[ÁÀÂÃ]/g,"A");
+palavra = palavra.replace(/[éèê]/g,"e");
+palavra = palavra.replace(/[ÉÈÊ]/g,"E");
+palavra = palavra.replace(/[íìî]/g,"i");
+palavra = palavra.replace(/[óòôõº]/g,"o");
+palavra = palavra.replace(/[ÓÒÔÕ]/g,"O");
+palavra = palavra.replace(/[úùû]/g,"u");
+palavra = palavra.replace(/[ÚÙÛ]/g,"U");
+return palavra;
+}
+ 
+
+function forca() {}
+ 
+function executa(e){
+
+    if(typeof(e)=='undefined')var e=window.event;
+    source=e.target?e.target:e.srcElement;
+    if(source.nodeType==3)source=source.parentNode ;
+ 
+
+var letra=source.value.tiraacento();
+ 
+
+var validentry=/[A-Za-zÀ-ú]/
+source.value="";
+if(!validentry.test(letra)) return false
+ 
+
+if(!this.letrastentadas.search(letra)) {
+this.letrastentadas.push(letra);
+this.tries.innerHTML = "Letras tentadas: " + this.letrastentadas.chrArrayToString(',');
+}
+if (this.palavraminuscula.indexOf(letra) != -1){ 
+
+this.mostraletras(letra);
+}else{ 
+this.divmessages.innerHTML = 'A palavra não contém a letra ' + letra;
+this.verificaerros(letra);
+}
+}
+ 
+function verificaerros(letra){
+
+if (this.errors ==0 || !this.erradasletras.search(letra)){
+this.erradasletras.push(letra);
+this.erros++;
+}
+ 
+this.diverros.innerHTML = this.erros + ' erro(s)';
+ 
+
+if (this.erros>5){
+this.divmessages.innerHTML = 'Game Over!<br /> A palavra era ' + this.palavraselecionada;
+var denovo = confirm("Quer Tentar de Novo?");
+if (denovo==true) this.init();
+}
+}
+ 
+function mostraletras(caractere){
+for (var x=this.t-1; x>=0;x--){
+if (this.palavraminuscula.charAt(x) == caractere) this.board[x]=1;
+}
+this.mostrapalavra();
+}
+ 
+function mostrapalavra(){
+for (var x=0; x<this.t;x++){
+if (this.board[x] & 1){
+var ch = this.selecionadaarray[x];
+this.wordoculta=this.wordoculta.replaceAt(x, ch);
+this.board[x] = 2;
+}
+}
+this.telaoculta.innerHTML = this.wordoculta;
+ 
+if (this.wordoculta==this.palavraselecionada){
+this.telaoculta.innerHTML = "Parabéns, você acertou! A palavra é: " + this.palavraselecionada;
+var denovo = confirm("Quer Jogar Novamente?");
+if (denovo==true) this.init()
+}
+}
+ 
+function iniciar(){
+this.erros=0;
+this.wordoculta=new String;
+this.erradasletras=new Array;
+this.letrastentadas=new Array;
+this.board=new Array;
+this.selecionadaarray=new Array;
+ 
+var palavras = new Array('ricardo', 'douglas', 'clara', 'izabel', 'Cidades', 'Coração', 'raquel', 'luana', 
+'Rafael', 'Akira','televisao','firefox','php','manga','gamba', 'escola', 'computador','mouse');
+ 
+this.size = document.getElementById('tamanho');
+this.divmessages = document.getElementById('messages');
+this.diverros=document.getElementById('erros');
+this.telaoculta=document.getElementById('palavraoculta');
+this.tries=document.getElementById('tentativas');
+ 
+this.palavraselecionada = palavras.random();
+this.palavraminuscula = this.palavraselecionada.tiraacento();
+this.t=this.palavraselecionada.length;
+ 
+this.wordoculta=this.palavraminuscula.replace(/[A-Za-zÀ-ú]/g,'_');
+for (var z=0;z<this.t;z++){
+  this.board[z]=0;
+  this.selecionadaarray[z] = this.palavraselecionada.charAt(z);
+}
+this.telaoculta.innerHTML = this.wordoculta;
+this.divmessages.innerHTML = 'Jogo Reiniciado';
+this.diverros.innerHTML = 'Nenhum Erro Até O Momento';
+this.size.innerHTML = 'A palavra tem ' + this.t + ' letras';
+this.tries.innerHTML = "Letras Jogadas:";
+}
+ 
+forca.prototype.executa=executa
+forca.prototype.verificaerros=verificaerros
+forca.prototype.mostraletras=mostraletras
+forca.prototype.mostrapalavra=mostrapalavra
+forca.prototype.init=iniciar
+ 
+function executaforca(e){
+fo.executa(e);
+}
+ 
+function reinicio(){
+document.getElementById('entrada').focus();
+fo.init();
+}
+ 
+window.onload = init
+ 
+function init(){
+document.getElementById('entrada').focus();
+fo = new forca();
+fo.init();
+var inputentry=document.getElementById('entrada');
+inputentry.onkeyup=executaforca;
+var novo=document.getElementById('new');
+novo.onclick=reinicio
+}
+</script>
+ 
+<style>
+input.hid{ display:none; }
+body{ background-color:#fff; font-family:Verdana,Arial,Helvetica; color:Black; font-weight:bold;}
+#palavraoculta{ letter-spacing:5px; }
+input.entry{ border:1px solid red; background-color: yellow ; }
+</style>
+ 
+<head>
+<title>Jogo Da Forca</title>
+</head>
+<center>
+<br><br><br>
+<body>
+<div id="tamanho"></div>
+<div id="erros"></div>
+<div id="palavraoculta"></div>
+<br />
+<form>
+<input id="hid" class="hid"></input>
+<input id="entrada" type="text" class="entry" size="1" maxlength="1"></input>
+<div id="messages"></div>
+<div id="tentativas"></div><br />
+<input type="button" value="Tentar Outra Palavra" id="new"></input>
+</form>
+<pre>
+
+</pre>
+ 
+</body>
+</center>
+</html>
